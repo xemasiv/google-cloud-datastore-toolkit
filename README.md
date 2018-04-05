@@ -2,6 +2,7 @@ Google Cloud Datastore Toolkit
 
 ### Summary:
 * Goals are predictability and readability
+* Check test.js for working example
 
 ## Reader:
 
