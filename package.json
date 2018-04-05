@@ -1,0 +1,31 @@
+{
+  "name": "google-cloud-datastore-toolkit",
+  "version": "2.0.0",
+  "description": "Datastore with predictability and readability in mind.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/xemasiv/google-cloud-datastore-toolkit.git"
+  },
+  "keywords": [
+    "google",
+    "cloud",
+    "datastore",
+    "nosql",
+    "promises",
+    "toolkit"
+  ],
+  "author": "xemasiv",
+  "license": "Unlicense",
+  "bugs": {
+    "url": "https://github.com/xemasiv/google-cloud-datastore-toolkit/issues"
+  },
+  "homepage": "https://github.com/xemasiv/google-cloud-datastore-toolkit#readme",
+  "dependencies": {
+    "@google-cloud/datastore": "^1.4.0",
+    "uuid-random": "^1.0.6"
+  }
+}
