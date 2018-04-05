@@ -15,8 +15,9 @@ const constructorOpts = {
 // Destructure
 const DatastoreToolkit = require('google-cloud-datastore-toolkit');
 const { Reader, Entity, Batch } = DatastoreToolkit(constructorOpts);
+```
 
-
+```
 // Create a person
 let personEntity = new Entity('Person');
 let personData = {
@@ -76,62 +77,60 @@ batchDelete
 
 * Check test.js for working example
 
-## Reader:
 
-#### Methods:
+## Reader Methods:
 
-* constructor(kind <String>, endCursor <String:OPTIONAL> )
-* select(field/s <String>/<Array>)
+* constructor(kind [String], endCursor [String:OPTIONAL] )
+* select(field/s [String]/[Array])
   * returns self, for chaining
-* ascend(col <String>)
+* ascend(col [String])
   * returns self, for chaining
-* descend(col <String>)
+* descend(col [String])
   * returns self, for chaining
-* filter(col <String>, operator <String>, val <WhateverTheFuckYouWant>)
+* filter(col [String], operator [String], val [WhateverTheFuckYouWant])
   * returns self, for chaining
-* limit(limit <Int>)
+* limit(limit [Int])
   * returns self, for chaining
 * runQuery()
   * returns {entities, keys, endCursor}
 
-## Entity:
 
-#### Methods:
+## Entity Methods:
 
-* constructor(kind <String>)
+* constructor(kind [String])
   * specifies the kind of this entity
 * fromUUID()
   * self-generates the key name as a uuidv4 string, checked for collision
   * returns Promise
-* fromName(name <String>)
+* fromName(name [String])
   * uses the provided string as the key name
   * returns Promise
-* fromFilters(filters <Array>)
+* fromFilters(filters [Array])
   * runs a query using filters, picks the first result
   * returns Promise
 * getKey()
-  * returns Promise of key <Object>
+  * returns Promise of key [Object]
 * getData()
-  * returns Promise of data <Object>
-* upsert(data <Object>)
+  * returns Promise of data [Object]
+* upsert(data [Object])
   * upserts data
   * returns Promise
-* merge(data <Object>)
+* merge(data [Object])
   * fetches data first, then merges provided data (see source code)
   * returns Promise
 
-## Batch:
 
-#### Methods:
+## Batch Methods:
 
-* constructor(type <Batch.Types>)
+* constructor(type [Batch.Types])
   * specifies the type of method for this batch operation
-* pushKeys (keys <ObjectArray>)
-* pushKey (key <Object>)
-* pushEntity (entity <Entity>)
+* pushKeys (keys [ObjectArray])
+* pushKey (key [Object])
+* pushEntity (entity [Entity])
 * execute ()
 
-#### Statics:
 
-* Types <Object>
+## Batch Statics:
+
+* Types [Object]
   * DELETE
