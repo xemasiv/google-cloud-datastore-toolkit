@@ -1,14 +1,14 @@
 process.env["GOOGLE_APPLICATION_CREDENTIALS"] = __dirname.concat("/test.json");
 const {
-  _Reader,
-  _Entity,
-  _Batch,
+  Reader,
+  Entity,
+  Batch,
   _Chain
 } = require('./index')({
   projectId: 'pac-1234'
 });
 
-let personEntity = new _Entity('Person');
+let personEntity = new Entity('Person');
 let personData = {
   date_created: Date.now(),
   name: 'Xema'
@@ -16,8 +16,8 @@ let personData = {
 let personAppendedData = {
   last_name: 'Siv'
 };
-let personReader = new _Reader('Person');
-let personBatchOperation = new _Batch(_Batch.Types.DELETE);
+let personReader = new Reader('Person');
+let personBatchOperation = new Batch(Batch.Types.DELETE);
 _Chain()
   .then(() => personEntity.fromUUID())
   .then(() => personEntity.upsert(personData))

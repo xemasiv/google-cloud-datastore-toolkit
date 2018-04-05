@@ -2,10 +2,10 @@ const GoogleCloudDatastore = require('@google-cloud/datastore');
 const UUID = require('uuid-random');
 
 // TODO:
-// _Batch
+// Batch
 // Deleting of entities
 // Batch operations
-// _Entity
+// Entity
 // Delete
 
 const Toolkit = (opts) => {
@@ -15,7 +15,7 @@ const Toolkit = (opts) => {
     DELETE: 'DELETE'
   };
 
-  class _Batch{
+  class Batch{
     constructor (type) {
       switch (type) {
         case Types.DELETE:
@@ -55,7 +55,7 @@ const Toolkit = (opts) => {
     }
   }
 
-  class _Reader{
+  class Reader{
     constructor (kind, endCursor) {
       let query = Datastore.createQuery(kind);
       if (Boolean(endCursor) === true) {
@@ -105,7 +105,7 @@ const Toolkit = (opts) => {
     }
   };
 
-  class _Entity{
+  class Entity{
     constructor (kind) {
       this.kind = kind;
     }
@@ -206,6 +206,6 @@ const Toolkit = (opts) => {
     return new Promise(r => r());
   };
 
-  return { _Reader, _Entity, _Batch, _Chain };
+  return { Reader, Entity, Batch, _Chain };
 }
 module.exports = Toolkit;
