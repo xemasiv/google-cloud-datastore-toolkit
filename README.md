@@ -8,12 +8,13 @@
 ### Changelog
 
 * v3
-  * Entityw no has strict consistency with Datastore
-  * fromUUID() now upserts with empty data.
-  * fromKeyName() now auto-loads data, with auto-upsert option if no record was found.
-  * fromFilters() now auto-loads data.
-  * merge() and upsert() now also fetches data for consistency.
+  * Entity now has strict consistency with Datastore
+  * `fromUUID()` now upserts with empty data.
+  * `fromKeyName(keyName, autoUpsert)` now auto-loads data, with auto-upsert option if no record was found.
+  * `fromFilters(filters)` now auto-loads data.
+  * `merge(data)` and `upsert(data)` now also fetches data for consistency.
   * Internal use of `_kind`, `_key` and `_data`, so unwanted mutations with `.kind`, `.key` and `.data` will be ignored.
+  * `Entity.exists(kind, keyName)` as static function.
 * v2
   * Everything's a mess, don't use.
 
