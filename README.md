@@ -24,49 +24,37 @@
     * `kind` is our Entity's kind.
     * Arguments:
       * kind / args[0] / String
-  * `.fromUUID()` Function
+  * `.fromUUID()` Function, returns Promise
     * Generates a random UUIDv4 string for the entity's key name.
     * Availability of UUIDv4 string as key name is verified.
     * Upserts an empty data to reserve entry, for consistency.
     * Sets `Entity.key` and `Entity.data` properties before resolving.
-    * Returns:
-      * Promise.resolve();
-  * `.fromKeyName(keyName, autoUpsert)` Function
+  * `.fromKeyName(keyName, autoUpsert)` Function, returns Promise
     * Uses the supplied `keyName` as the key name for this entity.
     * Boolean `autoUpsert` can be set to `true` to auto-upsert empty data.
     * Sets `Entity.key` and `Entity.data` properties before resolving.
-    * Returns:
-      * Promise.resolve();
     * Arguments:
       * `keyName` / args[0] / String
       * `autoUpsert` / args[1] / Boolean, Optional, Default = false
-  * `.fromFilters()` Function
+  * `.fromFilters()` Function, returns Promise
     * We uses the key of the first entity that matches supplied filters.
     * Sets `Entity.key` and `Entity.data` properties before resolving.
-    * Returns:
-      * Promise.resolve();
     * Arguments:
       * `filters` / args[0] / Array of Filters
       * Example format of a `filter` is ['column', 'operator', 'value']
-  * `.upsert()` Function
+  * `.upsert()` Function, returns Promise
     * Upserts supplied data.
     * Also fetches data afterwards to re-assign `Entity.data` property, for consistency.
-    * Returns:
-      * Promise.resolve();
     * Arguments:
       * data / args[0] / Object
-  * `.merge()` Function
+  * `.merge()` Function, returns Promise
     * Same like upsert, except we merge new data with existing data.
     * Also fetches data afterwards to re-assign `Entity.data` property, for consistency.
-    * Returns:
-      * Promise.resolve();
     * Arguments:
       * data / args[0] / Object
-  * `.delete()` Function
+  * `.delete()` Function, returns Promise
     * Deletes the entity from Datastore.
     * Then sets `.key`, and `.data` properties of Entity to undefined.
-    * Returns:
-      * Promise.resolve();
   * `.kind` Property
   * `.key` Property
   * `.data` Property
