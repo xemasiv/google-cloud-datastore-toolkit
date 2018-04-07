@@ -3,6 +3,7 @@ const UUID = require('uuid-random');
 const async = require('async');
 const redis = require('redis');
 const hashObj = require('hash-obj');
+const CircularJSON = require('circular-json');
 
 const Toolkit = (opts) => {
   const Datastore = new GoogleCloudDatastore(opts);
@@ -97,6 +98,7 @@ const Toolkit = (opts) => {
         console.log('cache.available:', cache.available);
         console.log(query);
         console.log(Object.keys(query));
+        console.log(CircularJSON.stringify(query));
         if (Boolean(cache) === true && cache.available === true) {
           let key = hashObj(query, { algorithm: 'sha256' });
           console.log(key);
