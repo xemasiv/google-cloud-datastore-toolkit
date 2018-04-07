@@ -396,7 +396,11 @@ const Toolkit = (opts) => {
     awaitConnection () {
       const client = this._client;
       return new Promise((resolve, reject) => {
-        client.on('connect', resolve);
+        if (this._client.connected === true) {
+          resolve();
+        } else {
+          client.on('connect', resolve);
+        }
       });
     }
     get (key) {
