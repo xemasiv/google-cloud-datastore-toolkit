@@ -143,14 +143,6 @@ const Toolkit = (opts) => {
                     data = { entities, keys, endCursor };
                     cache
                       .set(key, JSON.stringify(data), expires)
-                      .then((y) => {
-                        console.log(y);
-                        return cache.get(key);
-                      })
-                      .then((y) => {
-                        console.log(y);
-                        return Promise.resolve();
-                      })
                       .then(() => resolve(data))
                       .catch(reject);
                   })
