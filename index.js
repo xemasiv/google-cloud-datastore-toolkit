@@ -282,6 +282,23 @@ const Toolkit = (opts) => {
     get kind () {
       return this._kind;
     }
+    static exists (kind, keyName) {
+      return new Promise((resolve, reject)=>{
+        let key = Datastore.key([kind, keyName]);
+        Datastore
+          .get(key)
+          .then((results) => {
+            if (Boolean(results[0]) === true) {
+              resolve(true);
+            } else {
+              resolve(false)
+            }
+          })
+          .catch(
+            DatastoreErrorReject(reject)
+          )
+      });
+    }
   }
 
   return { Reader, Entity, Batch };
