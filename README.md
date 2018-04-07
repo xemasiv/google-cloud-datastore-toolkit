@@ -62,7 +62,11 @@
   * `.ErrorTypes` static Property
     * ENTITY_NOT_FOUND
     * DATASTORE_ERROR
-
+  * `.exists(kind, keyName)` static Function, returns Promise
+    * Checks if entity exists, resolves a boolean.
+    * Arguments:
+      * kind / args[0] / String
+      * keyName / args[1] / String
 
 
 ```

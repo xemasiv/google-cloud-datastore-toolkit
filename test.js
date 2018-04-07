@@ -34,7 +34,10 @@ Promise.resolve()
     console.log('TEST: Mutating data.. alice.data should still be {}');
     alice.data = 123;
     console.log('alice data:', alice.data);
-    return Promise.resolve();
+    return Entity
+      .exists('Person', alice.key.name)
+      .then((result) => console.log('alice exists?:', result))
+      .then(() => Promise.resolve())
   })
   .then(() => {
     console.log('Upserting data..');
