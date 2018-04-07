@@ -107,7 +107,7 @@ const Toolkit = (opts) => {
             if (Boolean(cache) === true && cache.available === true) {
               cache
                 .get(key)
-                .then((reply) => JSON.parse(reply))
+                .then((reply) => Promise.resolve(JSON.parse(reply)))
             } else {
               return Promise.resolve();
             }
