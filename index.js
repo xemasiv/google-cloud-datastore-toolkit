@@ -102,23 +102,26 @@ const Toolkit = (opts) => {
             { algorithm: 'sha256' }
           );
           console.log(key);
+          console.log('Checking key..');
+          cache.get(key)
+            .then(console.log)
+            .catch(console.log);
         } else {
-
+          Datastore
+            .runQuery(this._query)
+            .then((results)=>{
+              let entities = results[0];
+              let keys = entities.map(entity => entity[Datastore.KEY]);
+              let info = results[1];
+              let endCursor = (
+                info.moreResults !== Datastore.NO_MORE_RESULTS ?
+                info.endCursor :
+                null
+              );
+              resolve({entities, keys, endCursor});
+            })
+            .catch(reject);
         }
-        Datastore
-          .runQuery(this._query)
-          .then((results)=>{
-            let entities = results[0];
-            let keys = entities.map(entity => entity[Datastore.KEY]);
-            let info = results[1];
-            let endCursor = (
-              info.moreResults !== Datastore.NO_MORE_RESULTS ?
-              info.endCursor :
-              null
-            );
-            resolve({entities, keys, endCursor});
-          })
-          .catch(reject);
       });
     }
   };
