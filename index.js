@@ -102,6 +102,7 @@ const Toolkit = (opts) => {
           CircularJSON.stringify(query),
           { algorithm: 'sha256' }
         );
+        let data;
         Promise.resolve()
           .then(() => {
             if (Boolean(cache) === true && cache.available === true) {
@@ -109,20 +110,21 @@ const Toolkit = (opts) => {
               cache
                 .get(key)
                 .then((reply) => {
-                  console.log('FETCHED:', reply);
+                  console.log('FETCHED SUCCESSFUL');
+                  data = JSON.parse(reply);
                   return Promise.resolve();
                 })
             } else {
               return Promise.resolve();
             }
           })
-          .then((reply) => {
-            console.log('REPLY:', reply);
+          .then(() => {
+            console.log('DATA:', data);
             // reply = value received from cache.
-            if (Boolean(reply) === true) {
+            if (Boolean(data) === true) {
               console.log('RESOLVING FROM CACHE');
               // if we have it, resolve it.
-              return Promise.resolve(reply);
+              return Promise.resolve();
             } else {
               console.log('RESOLVING FROM DATASTORE FETCH');
               // if not, we load it then cache it.
@@ -138,17 +140,19 @@ const Toolkit = (opts) => {
                       info.endCursor :
                       null
                     );
-                    let data = { entities, keys, endCursor };
+                    data = { entities, keys, endCursor };
                     cache
                       .set(key, JSON.stringify(data), expires)
-                      .then(() => resolve(data))
+                      .then(() => resolve())
                       .catch(reject);
                   })
                   .catch(reject);
               });
             }
           })
-          .then(resolve)
+          .then(() => {
+            resolve(data);
+          })
           .catch(reject);
       });
     }
