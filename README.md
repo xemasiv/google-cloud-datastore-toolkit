@@ -69,6 +69,31 @@
       * kind / args[0] / String
       * keyName / args[1] / String
 
+* Reader
+* Batch
+* IterablePromise
+  * `constructor(iterableArray)` Function
+    * `iterableArray` is the iterable to be iterated.
+    * Arguments:
+      * iterableArray / args[0] / Array
+  * `.all(promiseExecutorFunction)` Function, returns Promise
+    * `promiseExecutorFunction` is the function to execute on all iterated values.
+    * `promiseExecutorFunction` should takes `item`, `index`, `resolve` and `reject`, in order, and should call `resolve` or `reject`.
+    * Returns a promise, which means this can be chained.
+    * Arguments:
+      * promiseExecutorFunction / args[0] / Function
+* Queue
+  * `constructor(concurrency)` Function
+    * `concurrency` is the concurrency of this Queue instance.
+    * Arguments:
+      * concurrency / args[0] / Integer
+  * `.push(executableFunction)` Function, returns Promise
+    * Pushes an `executableFunction` to the queue.
+    * Returns a promise, which means this can be chained.
+    * `executableFunction` should take the argument `callback` then execute it once done, as shown in examples.
+    * Arguments:
+      * executableFunction / args[0] / Function
+
 ### Setup:
 
 ```
@@ -86,6 +111,7 @@ const { Reader, Entity, Batch } = DatastoreToolkit(constructorOpts);
 ```
 
 ### Preloading entities:
+
 ```
 let alice = new Entity('Person');
 let bob = new Entity('Person');
@@ -96,5 +122,32 @@ Promise.all([
   .then(() => {
     console.log(alice.data, bob.data);
   })
+  .catch()
+```
+
+### Queue
+
+```
+let myQueue = new Queue();
+let queueItem = myQueue.push((callback)=>{
+    setTimeout(() => {
+      callback();
+    }, 5000)
+  })
+  .then(() => console.log('queue ok!'))
+  .catch(console.log);
+```
+
+### IterablePromise
+
+```
+new IterablePromise([1,2,3,4,5])
+  .all((item, index, resolve, reject) => {
+    setTimeout(() => {
+      console.log(item, index);
+      resolve();
+    }, 5500)
+  })
+  .then()
   .catch()
 ```

@@ -1,5 +1,6 @@
 const GoogleCloudDatastore = require('@google-cloud/datastore');
 const UUID = require('uuid-random');
+const async = require('async');
 
 const Toolkit = (opts) => {
   const Datastore = new GoogleCloudDatastore(opts);
@@ -12,7 +13,8 @@ const Toolkit = (opts) => {
     DATASTORE_ERROR: 'DATASTORE_ERROR'
   };
 
-  class Batch{
+
+  class Batch {
     constructor (type) {
       switch (type) {
         case Types.DELETE:
@@ -52,7 +54,7 @@ const Toolkit = (opts) => {
     }
   }
 
-  class Reader{
+  class Reader {
     constructor (kind, endCursor) {
       let query = Datastore.createQuery(kind);
       if (Boolean(endCursor) === true) {
@@ -111,7 +113,7 @@ const Toolkit = (opts) => {
     }
   };
 
-  class Entity{
+  class Entity {
     constructor (kind) {
       this._kind = kind;
     }
@@ -301,6 +303,43 @@ const Toolkit = (opts) => {
     }
   }
 
-  return { Reader, Entity, Batch };
+  class Queue {
+    constructor (concurrency) {
+      let queue = async.queue((executableFunction, callback) => {
+        executableFunction(callback);
+      }, Boolean(parseInt(concurrency)) ? concurrency : 1);
+      this._queue = queue;
+    }
+    push (executableFunction) {
+      let queue = this._queue;
+      return new Promise((resolve, reject) => {
+        queue.push(executableFunction, (err) => {
+          if (err) {
+            reject(err);
+            return;
+          }
+          resolve();
+        });
+      });
+    }
+  }
+
+  class IterablePromise{
+    constructor (iterableArray) {
+      this._iterableArray = iterableArray;
+    }
+    all (promiseExecutorFunction) {
+      let iterableArray = this._iterableArray;
+      return Promise.all(
+        iterableArray.map((item, index) => {
+          return new Promise((resolve, reject)=>{
+            promiseExecutorFunction(item, index, resolve, reject);
+          });
+        })
+      );
+    }
+  }
+
+  return { Reader, Entity, Batch, IterablePromise, Queue };
 }
 module.exports = Toolkit;
