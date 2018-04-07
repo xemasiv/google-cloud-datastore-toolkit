@@ -31,6 +31,9 @@ Promise.resolve()
   .then(() => {
     console.log('alice key:', alice.key);
     console.log('alice data:', alice.data);
+    console.log('TEST: Mutating data.. alice.data should still be {}');
+    alice.data = 123;
+    console.log('alice data:', alice.data);
     return Promise.resolve();
   })
   .then(() => {

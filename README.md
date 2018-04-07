@@ -1,6 +1,23 @@
-Google Cloud Datastore Toolkit
+### Google Cloud Datastore Toolkit
 
-### Classes, Methods & Arguments
+* Goals
+  * Entities as variables consistent with their Datastore records.
+
+
+### Changelog
+
+* v3
+  * Entity no has strict consistency with Datastore
+    * fromUUID() now upserts with empty data.
+    * fromKeyName() now auto-loads data, with auto-upsert option if no record was found.
+    * fromFilters() now auto-loads data.
+    * merge() and upsert() now also fetches data for consistency.
+    * Internal use of `_kind`, `_key` and `_data`, so unwanted mutations with `.kind`, `.key` and `.data` will be ignored.
+* v2
+  * Everything's a mess, don't use.
+
+
+### Classes, Methods, Arguments & Properties
 
 * Entity
   * `constructor(kind)` Function
@@ -50,25 +67,14 @@ Google Cloud Datastore Toolkit
     * Then sets `.key`, and `.data` properties of Entity to undefined.
     * Returns:
       * Promise.resolve();
-  * `.data` Property
+  * `.kind` Property
   * `.key` Property
+  * `.data` Property
   * `.ErrorTypes` static Property
     * ENTITY_NOT_FOUND
     * DATASTORE_ERROR
 
-### Changelog
 
-* v3
-  * Entity no has strict consistency with Datastore
-    * fromUUID() now upserts with empty data.
-    * fromKeyName() now auto-loads data, with auto-upsert option if no record was found.
-    * fromFilters() now auto-loads data.
-    * merge() and upsert() now also fetches data for consistency.
-* v2
-  * Everything's a mess, don't use.
-
-### Summary:
-* Goals are predictability and readability
 
 ```
 // Set path for JSON, optional if already set in your environment

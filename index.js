@@ -113,11 +113,11 @@ const Toolkit = (opts) => {
 
   class Entity{
     constructor (kind) {
-      this.kind = kind;
+      this._kind = kind;
     }
     fromUUID () {
       let instance = this;
-      let { kind } = instance;
+      let kind = instance._kind;
       let uuid;
       let key;
       let data = {};
@@ -131,38 +131,45 @@ const Toolkit = (opts) => {
               if (Boolean(results[0]) === true) {
                 RecurseUUID();
               } else {
-                instance.key = key;
-                instance.data = data;
+                instance._key = key;
+                instance._data = data;
                 Datastore
                   .upsert({key, data})
                   .then(() => resolve())
-                  .catch(DatastoreErrorReject(reject));
+                  .catch(
+                    DatastoreErrorReject(reject)
+                  );
               }
             })
-            .catch(DatastoreErrorReject(reject));
+            .catch(
+              DatastoreErrorReject(reject)
+            );
         };
         RecurseUUID();
       });
     }
     fromKeyName (keyName, autoUpsert) {
       let instance = this;
-      let key = Datastore.key([this.kind, keyName]);
+      let kind = instance._kind;
+      let key = Datastore.key([kind, keyName]);
       let data = {};
       return new Promise((resolve, reject)=>{
         Datastore
           .get(key)
           .then((results) => {
             if (Boolean(results[0]) === true) {
-              instance.key = key;
-              instance.data = results[0];
+              instance._key = key;
+              instance._data = results[0];
               resolve();
             } else {
-              instance.key = key;
-              instance.data = data;
               if (Boolean(autoUpsert) === true) {
                 Datastore
                   .upsert({key, data})
-                  .then(() => resolve())
+                  .then(() => {
+                    instance._key = key;
+                    instance._data = data;
+                    resolve();
+                  })
                   .catch(DatastoreErrorReject(reject));
               } else {
                 reject({
@@ -171,14 +178,17 @@ const Toolkit = (opts) => {
               }
             }
           })
-          .catch(DatastoreErrorReject(reject));
+          .catch(
+            DatastoreErrorReject(reject)
+          );
       });
     }
     fromFilters (filters) {
       let instance = this;
+      let kind = instance._kind;
       return new Promise((resolve, reject)=>{
         let query = Datastore
-          .createQuery(this.kind)
+          .createQuery(kind)
           .limit(1);
         filters.map((filter)=>{
           query = query.filter(filter[0], filter[1], filter[2]);
@@ -189,8 +199,8 @@ const Toolkit = (opts) => {
             let entities = results[0];
             let keys = entities.map(entity => entity[Datastore.KEY]);
             if (Boolean(entities[0]) === true) {
-              instance.data = entities[0];
-              instance.key = keys[0];
+              instance._data = entities[0];
+              instance._key = keys[0];
               resolve();
             } else {
               reject({
@@ -198,58 +208,79 @@ const Toolkit = (opts) => {
               });
             }
           })
-          .catch((...args) => {
-            reject({
-              type: EntityErrorTypes.DATASTORE_ERROR,
-              info: args
-            })
-          });
+          .catch(
+            DatastoreErrorReject(reject)
+          );
       });
     }
     merge (newData) {
       let instance = this;
-      let { key } = instance;
-      return Promise.resolve()
-        .then(() => Datastore.get(key))
-        .then((results) => {
-          let existingData = results[0];
-          return Datastore.upsert({key,
-            data: {
-              ...existingData,
-              ...newData
-            }
-          });
-        })
-        .then(() => Datastore.get(key))
-        .then((results) => {
-          instance.data = results[0];
-          return Promise.resolve();
-        });
+      let key = instance._key;
+      return new Promise((resolve, reject)=>{
+        Promise.resolve()
+          .then(() => Datastore.get(key))
+          .then((results) => {
+            let existingData = results[0];
+            return Datastore.upsert({key,
+              data: {
+                ...existingData,
+                ...newData
+              }
+            });
+          })
+          .then(() => Datastore.get(key))
+          .then((results) => {
+            instance._data = results[0];
+            resolve();
+          })
+          .catch(
+            DatastoreErrorReject(reject)
+          );
+      });
     }
     upsert (data) {
       let instance = this;
-      let { key } = instance;
-      return Promise.resolve()
-        .then(() => Datastore.upsert({key, data}))
-        .then(() => Datastore.get(key))
-        .then((results) => {
-          instance.data = results[0];
-          return Promise.resolve();
-        });
+      let key = instance._key;
+      return new Promise((resolve, reject)=>{
+        Promise.resolve()
+          .then(() => Datastore.upsert({key, data}))
+          .then(() => Datastore.get(key))
+          .then((results) => {
+            instance._data = results[0];
+            resolve();
+          })
+          .catch(
+            DatastoreErrorReject(reject)
+          );
+      });
     }
     delete () {
       let instance = this;
-      let { key } = instance;
-      return Promise.resolve()
-        .then(() => Datastore.delete(key))
-        .then(() => {
-          instance.key = undefined;
-          instance.data = undefined;
-          return Promise.resolve();
-        });
+      let key = instance._key;
+      return new Promise((resolve, reject)=>{
+        Promise.resolve()
+          .then(() => Datastore.delete(key))
+          .then(() => {
+            instance._key = undefined;
+            instance._data = undefined;
+            resolve();
+          })
+          .catch(
+            DatastoreErrorReject(reject)
+          );
+      });
     }
     static get ErrorTypes() {
       return EntityErrorTypes;
+    }
+    get data () {
+      return this._data;
+    }
+    get key () {
+      return this._key;
+    }
+    get kind () {
+      return this._kind;
     }
   }
 
