@@ -14,7 +14,7 @@ let myCache = new RedisCache({
   url: '//10.140.0.2:6379',
   password: 'Bjq3DojKaYvj',
 });
-
+let myQueue = new Queue();
 let myReader = new Reader('Reports').useCache(myCache, 30);
 myReader.limit(10);
 let start_time;
@@ -40,10 +40,16 @@ Promise.resolve()
       }, 5000);
     });
   })
-  .then(() => myReader.runQuery())
   .then(() => {
-    console.log('Request took:', Date.now() - start_time, 'ms');
-    return Promise.resolve();
+    myQueue.push((callback)=>{
+      let start_time = Date.now();
+      myReader.runQuery().then(() => {
+        console.log('Request took:', Date.now() - start_time, 'ms');
+        callback();
+      });
+      })
+      .then(() => console.log('queue ok!'))
+      .catch(console.log);
   })
   .catch(console.log);
 
