@@ -106,54 +106,44 @@ const Toolkit = (opts) => {
         console.log('Key:', key);
         Promise.resolve()
           .then(() => {
-            if (Boolean(cache) === true && cache.available === true) {
-              console.log('GETTING FROM CACHE');
-              cache
-                .get(key)
-                .then((reply) => {
-                  data = JSON.parse(reply);
-                  console.log('FETCHED SUCCESSFUL');
-                  console.log(data);
-                  return Promise.resolve();
-                })
-            } else {
+            if (Boolean(cache) === false || cache.available === false) {
               return Promise.resolve();
             }
+            cache
+              .get(key)
+              .then((reply) => {
+                data = JSON.parse(reply);
+                return Promise.resolve();
+              })
           })
           .then(() => {
-            console.log('data:', data);
-            console.log('Boolean(data):', Boolean(data));
-            // reply = value received from cache.
+            return new Promise((resolve, reject) => {
             if (Boolean(data) === true) {
-              console.log('RESOLVING FROM CACHE');
-              // if we have it, resolve it.
-              return Promise.resolve();
-            } else {
-              console.log('RESOLVING FROM DATASTORE FETCH');
-              // if not, we load it then cache it.
-              return new Promise((resolve, reject) => {
-                Datastore
-                  .runQuery(this._query)
-                  .then((results)=>{
-                    let entities = results[0];
-                    let keys = entities.map(entity => entity[Datastore.KEY]);
-                    let info = results[1];
-                    let endCursor = (
-                      info.moreResults !== Datastore.NO_MORE_RESULTS ?
-                      info.endCursor :
-                      null
-                    );
-                    data = { entities, keys, endCursor };
-                    cache
-                      .set(key, JSON.stringify(data), expires)
-                      .then(() => resolve())
-                      .catch(reject);
-                  })
-                  .catch(reject);
-              });
+              resolve();
+              return;
             }
+            Datastore
+              .runQuery(this._query)
+              .then((results)=>{
+                let entities = results[0];
+                let keys = entities.map(entity => entity[Datastore.KEY]);
+                let info = results[1];
+                let endCursor = (
+                  info.moreResults !== Datastore.NO_MORE_RESULTS ?
+                  info.endCursor :
+                  null
+                );
+                data = { entities, keys, endCursor };
+                cache
+                  .set(key, JSON.stringify(data), expires)
+                  .then(() => resolve())
+                  .catch(reject);
+              })
+              .catch(reject);
+            });
           })
           .then(() => {
+            console.log(data);
             resolve(data);
           })
           .catch(reject);
