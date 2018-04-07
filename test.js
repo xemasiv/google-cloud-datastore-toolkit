@@ -49,7 +49,7 @@ Promise.resolve()
           callback();
         });
         })
-        .then(() => console.log('queue ok!'))
+        .then(console.log)
         .catch(console.log);
     }
   })

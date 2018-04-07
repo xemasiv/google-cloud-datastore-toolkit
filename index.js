@@ -106,15 +106,18 @@ const Toolkit = (opts) => {
         console.log('Key:', key);
         Promise.resolve()
           .then(() => {
-            if (Boolean(cache) === false || cache.available === false) {
-              return Promise.resolve();
-            }
-            cache
-              .get(key)
-              .then((reply) => {
-                data = JSON.parse(reply);
-                return Promise.resolve();
-              })
+            return new Promise((resolve, reject) => {
+              if (Boolean(cache) === false || cache.available === false) {
+                resolve();
+                return;
+              }
+              cache
+                .get(key)
+                .then((reply) => {
+                  data = JSON.parse(reply);
+                  resolve();
+                })
+            });
           })
           .then(() => {
             return new Promise((resolve, reject) => {
