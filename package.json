@@ -25,8 +25,8 @@
   },
   "homepage": "https://github.com/xemasiv/google-cloud-datastore-toolkit#readme",
   "dependencies": {
-    "@google-cloud/datastore": "^1.4.0",
-    "async": "^2.6.0",
-    "uuid-random": "^1.0.6"
+    "@google-cloud/datastore": "1.4.0",
+    "async": "2.6.0",
+    "uuid-random": "1.0.6"
   }
 }
