@@ -111,6 +111,7 @@ const Toolkit = (opts) => {
                 .get(key)
                 .then((reply) => {
                   console.log('FETCHED SUCCESSFUL');
+                  console.log(reply);
                   return Promise.resolve(JSON.parse(reply));
                 })
             } else {
