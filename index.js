@@ -102,6 +102,7 @@ const Toolkit = (opts) => {
           CircularJSON.stringify(query),
           { algorithm: 'sha256' }
         );
+        let data;
         console.log('Key:', key);
         Promise.resolve()
           .then(() => {
@@ -110,21 +111,23 @@ const Toolkit = (opts) => {
               cache
                 .get(key)
                 .then((reply) => {
+                  data = JSON.parse(reply);
                   console.log('FETCHED SUCCESSFUL');
-                  console.log(reply);
-                  return Promise.resolve(JSON.parse(reply));
+                  console.log(data);
+                  return Promise.resolve();
                 })
             } else {
               return Promise.resolve();
             }
           })
-          .then((data) => {
-            console.log('DATA:', data);
+          .then(() => {
+            console.log('data:', data);
+            console.log('Boolean(data):', Boolean(data));
             // reply = value received from cache.
             if (Boolean(data) === true) {
               console.log('RESOLVING FROM CACHE');
               // if we have it, resolve it.
-              return Promise.resolve(data);
+              return Promise.resolve();
             } else {
               console.log('RESOLVING FROM DATASTORE FETCH');
               // if not, we load it then cache it.
@@ -143,14 +146,14 @@ const Toolkit = (opts) => {
                     data = { entities, keys, endCursor };
                     cache
                       .set(key, JSON.stringify(data), expires)
-                      .then(() => resolve(data))
+                      .then(() => resolve())
                       .catch(reject);
                   })
                   .catch(reject);
               });
             }
           })
-          .then((data) => {
+          .then(() => {
             resolve(data);
           })
           .catch(reject);
