@@ -15,14 +15,36 @@ let myCache = new RedisCache({
   password: 'Bjq3DojKaYvj',
 });
 
-let myReader = new Reader('Reports').useCache(myCache);
+let myReader = new Reader('Reports').useCache(myCache, 30);
 
-myReader.limit(3);
-
+let start_time;
 Promise.resolve()
   .then(() => myCache.awaitConnection())
+  .then(() => {
+    console.log('FETCHING');
+    start_time = Date.now();
+    return Promise.resolve();
+  })
   .then(() => myReader.runQuery())
-  .then(console.log)
+  .then(() => {
+    console.log('Request took:', Date.now() - start_time, 'ms');
+    return Promise.resolve();
+  })
+  .then(() => {
+    console.log('DELAYING');
+    return new Promise((resolve, reject) => {
+      setTimeout(() => {
+        start_time = Date.now();
+        console.log('FETCHING');
+        resolve();
+      }, 20000);
+    });
+  })
+  .then(() => myReader.runQuery())
+  .then(() => {
+    console.log('Request took:', Date.now() - start_time, 'ms');
+    return Promise.resolve();
+  })
   .catch(console.log);
 
 myCache
