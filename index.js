@@ -113,11 +113,14 @@ const Toolkit = (opts) => {
             }
           })
           .then((reply) => {
+            console.log('REPLY:', reply);
             // reply = value received from cache.
             if (Boolean(reply) === true) {
+              console.log('RESOLVING FROM CACHE');
               // if we have it, resolve it.
               return Promise.resolve(reply);
             } else {
+              console.log('RESOLVING FROM DATASTORE FETCH');
               // if not, we load it then cache it.
               return new Promise((resolve, reject) => {
                 Datastore
