@@ -20,6 +20,7 @@ let myReader = new Reader('Reports').useCache(myCache);
 myReader.limit(3);
 
 Promise.resolve()
+  .then(() => myCache.awaitConnection())
   .then(() => myReader.runQuery())
   .then(console.log)
   .catch(console.log);

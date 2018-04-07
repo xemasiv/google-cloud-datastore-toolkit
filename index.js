@@ -360,6 +360,12 @@ const Toolkit = (opts) => {
       const client = redis.createClient(redisOpts);
       this._client = client;
     }
+    awaitConnection () {
+      const client = this._client;
+      return new Promise((resolve, reject) => {
+        client.on('connect', resolve);
+      });
+    }
     get (key) {
       const client = this._client;
       return new Promise((resolve, reject) => {
