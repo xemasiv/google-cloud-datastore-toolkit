@@ -102,6 +102,7 @@ const Toolkit = (opts) => {
           CircularJSON.stringify(query),
           { algorithm: 'sha256' }
         );
+        console.log('Key:', key);
         let data;
         Promise.resolve()
           .then(() => {
