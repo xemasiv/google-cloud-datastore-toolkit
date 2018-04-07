@@ -68,6 +68,7 @@
       * kind / args[0] / String
       * keyName / args[1] / String
 
+### Setup:
 
 ```
 // Set path for JSON, optional if already set in your environment
@@ -81,4 +82,18 @@ const constructorOpts = {
 // Destructure
 const DatastoreToolkit = require('google-cloud-datastore-toolkit');
 const { Reader, Entity, Batch } = DatastoreToolkit(constructorOpts);
+```
+
+### Preloading entities:
+```
+let alice = new Entity('Person');
+let bob = new Entity('Person');
+Promise.all([
+    alice.fromKeyName('alice_key_name'),
+    bob.fromKeyName('bob_key_name')
+  ])
+  .then(() => {
+    console.log(alice.data, bob.data);
+  })
+  .catch()
 ```
