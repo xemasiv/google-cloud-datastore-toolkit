@@ -15,8 +15,8 @@ let myCache = new RedisCache({
   password: 'Bjq3DojKaYvj',
 });
 
-let myReader = new Reader('Reports').useCache(myCache, 10);
-
+let myReader = new Reader('Reports').useCache(myCache, 30);
+myReader.limit(10);
 let start_time;
 Promise.resolve()
   .then(() => myCache.awaitConnection())
