@@ -15,7 +15,14 @@ let myCache = new RedisCache({
   password: 'Bjq3DojKaYvj',
 });
 myCache
-  .set('name', 'Isaiah Joshua', 10)
+  .set('name', 'Isaiah Joshua', 5)
+  .then(() => myCache.get('name'))
+  .then((response) => {
+    console.log(response);
+    return new Promise((resolve, reject) => {
+      setTimeout(resolve, 6);
+    });
+  })
   .then(() => myCache.get('name'))
   .then(console.log)
   .catch(console.log);
