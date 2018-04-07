@@ -15,7 +15,7 @@ let myCache = new RedisCache({
   password: 'Bjq3DojKaYvj',
 });
 
-let myReader = new Reader('Reports').useCache(myCache, 30);
+let myReader = new Reader('Reports').useCache(myCache, 10);
 
 let start_time;
 Promise.resolve()
@@ -37,7 +37,7 @@ Promise.resolve()
         start_time = Date.now();
         console.log('FETCHING');
         resolve();
-      }, 20000);
+      }, 5000);
     });
   })
   .then(() => myReader.runQuery())
@@ -47,6 +47,7 @@ Promise.resolve()
   })
   .catch(console.log);
 
+/*
 myCache
   .set('name', 'Isaiah Joshua', 5)
   .then(() => myCache.get('name'))
@@ -135,3 +136,4 @@ Promise.resolve()
   })
   .then(() => console.log(alice))
   .catch(console.error);
+*/
