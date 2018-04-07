@@ -1,6 +1,6 @@
 {
   "name": "google-cloud-datastore-toolkit",
-  "version": "3.0.1",
+  "version": "3.0.2",
   "description": "Datastore with predictability and readability in mind.",
   "main": "index.js",
   "scripts": {
@@ -28,7 +28,6 @@
     "@google-cloud/datastore": "1.4.0",
     "async": "2.6.0",
     "circular-json": "^0.5.1",
-    "hash-obj": "^1.0.0",
     "hasha": "^3.0.0",
     "redis": "^2.8.0",
     "uuid-random": "1.0.6"

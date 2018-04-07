@@ -103,7 +103,6 @@ const Toolkit = (opts) => {
           { algorithm: 'sha256' }
         );
         let data;
-        console.log('Key:', key);
         Promise.resolve()
           .then(() => {
             return new Promise((resolve, reject) => {
@@ -122,7 +121,6 @@ const Toolkit = (opts) => {
           .then(() => {
             return new Promise((resolve, reject) => {
               if (Boolean(data) === true) {
-                console.log('Successfully loaded from redis!');
                 resolve();
                 return;
               }
