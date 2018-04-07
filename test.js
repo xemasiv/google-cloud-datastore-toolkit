@@ -20,7 +20,7 @@ myCache
   .then((response) => {
     console.log(response);
     return new Promise((resolve, reject) => {
-      setTimeout(resolve, 6);
+      setTimeout(resolve, 6000);
     });
   })
   .then(() => myCache.get('name'))
