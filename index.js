@@ -118,28 +118,30 @@ const Toolkit = (opts) => {
           })
           .then(() => {
             return new Promise((resolve, reject) => {
-            if (Boolean(data) === true) {
-              resolve();
-              return;
-            }
-            Datastore
-              .runQuery(this._query)
-              .then((results)=>{
-                let entities = results[0];
-                let keys = entities.map(entity => entity[Datastore.KEY]);
-                let info = results[1];
-                let endCursor = (
-                  info.moreResults !== Datastore.NO_MORE_RESULTS ?
-                  info.endCursor :
-                  null
-                );
-                data = { entities, keys, endCursor };
-                cache
-                  .set(key, JSON.stringify(data), expires)
-                  .then(() => resolve())
-                  .catch(reject);
-              })
-              .catch(reject);
+              if (Boolean(data) === true) {
+                console.log('Boolean data is true!');
+                console.log(data);
+                resolve();
+                return;
+              }
+              Datastore
+                .runQuery(this._query)
+                .then((results)=>{
+                  let entities = results[0];
+                  let keys = entities.map(entity => entity[Datastore.KEY]);
+                  let info = results[1];
+                  let endCursor = (
+                    info.moreResults !== Datastore.NO_MORE_RESULTS ?
+                    info.endCursor :
+                    null
+                  );
+                  data = { entities, keys, endCursor };
+                  cache
+                    .set(key, JSON.stringify(data), expires)
+                    .then(() => resolve())
+                    .catch(reject);
+                })
+                .catch(reject);
             });
           })
           .then(() => {
