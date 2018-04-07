@@ -94,6 +94,7 @@ const Toolkit = (opts) => {
       return new Promise((resolve, reject)=>{
         let query = this._query;
         let cache = this._cache;
+        console.log('cache.available:', cache.available);
         if (Boolean(cache) === true && cache.available === true) {
           let key = hashObj(query, { algorithm: 'sha256' });
           console.log(key);
