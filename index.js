@@ -1,18 +1,15 @@
 const GoogleCloudDatastore = require('@google-cloud/datastore');
 const UUID = require('uuid-random');
 
-// TODO:
-// Batch
-// Deleting of entities
-// Batch operations
-// Entity
-// Delete
-
 const Toolkit = (opts) => {
   const Datastore = new GoogleCloudDatastore(opts);
 
   const Types = {
     DELETE: 'DELETE'
+  };
+  const EntityErrorTypes = {
+    ENTITY_NOT_FOUND: 'ENTITY_NOT_FOUND',
+    DATASTORE_ERROR: 'DATASTORE_ERROR'
   };
 
   class Batch{
@@ -105,6 +102,15 @@ const Toolkit = (opts) => {
     }
   };
 
+  const DatastoreErrorReject = (reject) => {
+    return (...args) => {
+      reject({
+        type: EntityErrorTypes.DATASTORE_ERROR,
+        info: args
+      })
+    }
+  };
+
   class Entity{
     constructor (kind) {
       this.kind = kind;
@@ -112,36 +118,67 @@ const Toolkit = (opts) => {
     fromUUID () {
       let instance = this;
       let { kind } = instance;
+      let uuid;
+      let key;
+      let data = {};
       return new Promise((resolve, reject)=>{
-        let uuid;
-        const EntityNameGenerationLoop = () => {
+        const RecurseUUID = () => {
           uuid = UUID();
-          let query = Datastore.createQuery(kind).filter('name', '=', uuid);
+          key = Datastore.key([kind, uuid]);
           Datastore
-            .runQuery(query)
+            .get(key)
             .then((results) => {
-              if (results[0].length !== 0) {
-                EntityNameGenerationLoop();
+              if (Boolean(results[0]) === true) {
+                RecurseUUID();
               } else {
-                instance.key = Datastore.key([kind, uuid]);
-                resolve();
+                instance.key = key;
+                instance.data = data;
+                Datastore
+                  .upsert({key, data})
+                  .then(() => resolve())
+                  .catch(DatastoreErrorReject(reject));
               }
             })
-            .catch(reject);
+            .catch(DatastoreErrorReject(reject));
         };
-        EntityNameGenerationLoop();
+        RecurseUUID();
       });
     }
-    fromName (name_or_id) {
-      this.key = Datastore.key([this.kind, name_or_id]);
-      return new Promise((r) => r());
+    fromKeyName (keyName, autoUpsert) {
+      let instance = this;
+      let key = Datastore.key([this.kind, keyName]);
+      let data = {};
+      return new Promise((resolve, reject)=>{
+        Datastore
+          .get(key)
+          .then((results) => {
+            if (Boolean(results[0]) === true) {
+              instance.key = key;
+              instance.data = results[0];
+              resolve();
+            } else {
+              instance.key = key;
+              instance.data = data;
+              if (Boolean(autoUpsert) === true) {
+                Datastore
+                  .upsert({key, data})
+                  .then(() => resolve())
+                  .catch(DatastoreErrorReject(reject));
+              } else {
+                reject({
+                  type: EntityErrorTypes.ENTITY_NOT_FOUND
+                })
+              }
+            }
+          })
+          .catch(DatastoreErrorReject(reject));
+      });
     }
     fromFilters (filters) {
       let instance = this;
       return new Promise((resolve, reject)=>{
         let query = Datastore
           .createQuery(this.kind)
-          .select('__key__')
           .limit(1);
         filters.map((filter)=>{
           query = query.filter(filter[0], filter[1], filter[2]);
@@ -151,42 +188,30 @@ const Toolkit = (opts) => {
           .then((results)=>{
             let entities = results[0];
             let keys = entities.map(entity => entity[Datastore.KEY]);
-            instance.key = keys[0];
-            if (entities[0] !== undefined) {
+            if (Boolean(entities[0]) === true) {
+              instance.data = entities[0];
+              instance.key = keys[0];
               resolve();
             } else {
-              reject('ENTITY_NOT_FOUND');
+              reject({
+                type: EntityErrorTypes.ENTITY_NOT_FOUND
+              });
             }
           })
-          .catch(reject);
-      });
-    }
-    getKey () {
-      let key = this.key;
-      return new Promise((r)=> r(key));
-    }
-    getData () {
-      let key = this.key;
-      return new Promise((resolve, reject)=>{
-        if (Boolean(key) === false) {
-          reject('MISSING_ENTITY_KEY');
-        }
-        Datastore
-          .get(key)
-          .then((results)=>{
-            if (results[0] !== undefined) {
-              let data = results[0]
-              resolve(data);
-            } else {
-              reject('ENTITY_NOT_FOUND');
-            }
-        });
+          .catch((...args) => {
+            reject({
+              type: EntityErrorTypes.DATASTORE_ERROR,
+              info: args
+            })
+          });
       });
     }
     merge (newData) {
-      let key = this.key;
-      return Datastore
-        .get(key).then((results)=>{
+      let instance = this;
+      let { key } = instance;
+      return Promise.resolve()
+        .then(() => Datastore.get(key))
+        .then((results) => {
           let existingData = results[0];
           return Datastore.upsert({key,
             data: {
@@ -194,18 +219,40 @@ const Toolkit = (opts) => {
               ...newData
             }
           });
+        })
+        .then(() => Datastore.get(key))
+        .then((results) => {
+          instance.data = results[0];
+          return Promise.resolve();
         });
     }
     upsert (data) {
-      let key = this.key;
-      return Datastore.upsert({key, data});
+      let instance = this;
+      let { key } = instance;
+      return Promise.resolve()
+        .then(() => Datastore.upsert({key, data}))
+        .then(() => Datastore.get(key))
+        .then((results) => {
+          instance.data = results[0];
+          return Promise.resolve();
+        });
+    }
+    delete () {
+      let instance = this;
+      let { key } = instance;
+      return Promise.resolve()
+        .then(() => Datastore.delete(key))
+        .then(() => {
+          instance.key = undefined;
+          instance.data = undefined;
+          return Promise.resolve();
+        });
+    }
+    static get ErrorTypes() {
+      return EntityErrorTypes;
     }
   }
 
-  const _Chain = () => {
-    return new Promise(r => r());
-  };
-
-  return { Reader, Entity, Batch, _Chain };
+  return { Reader, Entity, Batch };
 }
 module.exports = Toolkit;

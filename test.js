@@ -2,8 +2,7 @@ process.env["GOOGLE_APPLICATION_CREDENTIALS"] = __dirname.concat("/test.json");
 const {
   Reader,
   Entity,
-  Batch,
-  _Chain
+  Batch
 } = require('./index')({
   projectId: 'pac-1234'
 });
@@ -18,7 +17,39 @@ let personAppendedData = {
 };
 let personReader = new Reader('Person');
 let personBatchOperation = new Batch(Batch.Types.DELETE);
-_Chain()
+
+let alice = new Entity('Person');
+let aliceData = {
+  age: 16
+};
+Promise.resolve()
+  .then(() => {
+    console.log('Creating from UUID..');
+    return Promise.resolve();
+  })
+  .then(() => alice.fromUUID())
+  .then(() => {
+    console.log('alice key:', alice.key);
+    console.log('alice data:', alice.data);
+    return Promise.resolve();
+  })
+  .then(() => {
+    console.log('Upserting data..');
+    return alice.upsert(aliceData);
+  })
+  .then(() => {
+    console.log('alice key:', alice.key);
+    console.log('alice data:', alice.data);
+    return Promise.resolve();
+  })
+  .then(() => {
+    console.log('Deleting entity..');
+    return alice.delete();
+  })
+  .then(() => console.log(alice))
+  .catch(console.error);
+/*
+Promise.resolve()
   .then(() => personEntity.fromUUID())
   .then(() => personEntity.upsert(personData))
   .then(() => personEntity.getData())
@@ -46,3 +77,4 @@ _Chain()
     console.log('PERSONS BATCH DELETED ====================');
   })
   .catch(console.log);
+*/
