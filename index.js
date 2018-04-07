@@ -143,7 +143,6 @@ const Toolkit = (opts) => {
             });
           })
           .then(() => {
-            console.log(data);
             resolve(data);
           })
           .catch(reject);
