@@ -106,7 +106,12 @@ const Toolkit = (opts) => {
           .then(() => {
             if (Boolean(cache) === true && cache.available === true) {
               console.log('GETTING FROM CACHE');
-              cache.get(key)
+              cache
+                .get(key)
+                .then((reply) => {
+                  console.log('FETCHED:', reply);
+                  return Promise.resolve();
+                })
             } else {
               return Promise.resolve();
             }
