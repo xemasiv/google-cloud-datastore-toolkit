@@ -1,6 +1,6 @@
 {
   "name": "google-cloud-datastore-toolkit",
-  "version": "3.0.0",
+  "version": "3.0.1",
   "description": "Datastore with predictability and readability in mind.",
   "main": "index.js",
   "scripts": {
