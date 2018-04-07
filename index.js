@@ -1,6 +1,7 @@
 const GoogleCloudDatastore = require('@google-cloud/datastore');
 const UUID = require('uuid-random');
 const async = require('async');
+const redis = require('redis');
 
 const Toolkit = (opts) => {
   const Datastore = new GoogleCloudDatastore(opts);
@@ -12,7 +13,6 @@ const Toolkit = (opts) => {
     ENTITY_NOT_FOUND: 'ENTITY_NOT_FOUND',
     DATASTORE_ERROR: 'DATASTORE_ERROR'
   };
-
 
   class Batch {
     constructor (type) {
@@ -340,6 +340,44 @@ const Toolkit = (opts) => {
     }
   }
 
-  return { Reader, Entity, Batch, IterablePromise, Queue };
+  class RedisCache {
+    constructor (redisOpts) {
+      const client = redis.createClient(redisOpts);
+      this._client = client;
+    }
+    get (key) {
+      const client = this._client;
+      return new Promise((resolve, reject) => {
+        client.get(key, (err, reply) => {
+          console.log('err:', err);
+          console.log('reply:', reply);
+          Boolean(err) ? reject(err) : resolve(reply);
+        });
+      });
+    }
+    set (key, value, expires) {
+      const client = this._client;
+      return new Promise((resolve, reject) => {
+        if (Boolean(parseInt(expires)) === true) {
+          client.set(key, value, 'EX', expires, (err, reply) => {
+            console.log('err:', err);
+            console.log('reply:', reply);
+            Boolean(err) ? reject(err) : resolve(reply);
+          });
+        } else {
+          client.set(key, value, (err, reply) => {
+            console.log('err:', err);
+            console.log('reply:', reply);
+            Boolean(err) ? reject(err) : resolve(reply);
+          });
+        }
+      });
+    }
+    get available () {
+      return this._client.connected;
+    }
+  }
+
+  return { Reader, Entity, Batch, IterablePromise, Queue, RedisCache };
 }
 module.exports = Toolkit;

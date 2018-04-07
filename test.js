@@ -4,10 +4,21 @@ const {
   Entity,
   Batch,
   Queue,
-  IterablePromise
+  IterablePromise,
+  RedisCache
 } = require('./index')({
   projectId: 'pac-1234'
 });
+
+let myCache = new RedisCache({
+  url: '//10.140.0.2:6379',
+  password: 'Bjq3DojKaYvj',
+});
+myCache
+  .set('name', 'Isaiah Joshua', 10)
+  .then(() => myCache.get('name'))
+  .then(console.log)
+  .catch(console.log);
 
 let myQueue = new Queue();
 myQueue.push((callback)=>{
