@@ -41,15 +41,17 @@ Promise.resolve()
     });
   })
   .then(() => {
-    myQueue.push((callback)=>{
-      let start_time = Date.now();
-      myReader.runQuery().then(() => {
-        console.log('Request took:', Date.now() - start_time, 'ms');
-        callback();
-      });
-      })
-      .then(() => console.log('queue ok!'))
-      .catch(console.log);
+    for(let i=1; i <= 10; i++) {
+      myQueue.push((callback)=>{
+        let start_time = Date.now();
+        myReader.runQuery().then(() => {
+          console.log('Request took:', Date.now() - start_time, 'ms');
+          callback();
+        });
+        })
+        .then(() => console.log('queue ok!'))
+        .catch(console.log);
+    }
   })
   .catch(console.log);
 
