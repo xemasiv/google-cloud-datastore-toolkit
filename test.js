@@ -16,8 +16,11 @@ let myCache = new RedisCache({
 });
 
 let myReader = new Reader('Reports').useCache(myCache);
-myReader
-  .runQuery()
+
+myReader.limit(3);
+
+Promise.resolved()
+  .then(() => myReader.runQuery())
   .then(console.log)
   .catch(console.log);
 
