@@ -64,6 +64,7 @@ const Toolkit = (opts) => {
       }
       this._query = query;
       this._cache = undefined;
+      this._expires = undefined;
     }
     ascend (col) {
       this._query = this._query.order(col);
@@ -87,41 +88,61 @@ const Toolkit = (opts) => {
       this._query = this._query.limit(limit);
       return this;
     }
-    useCache (cache) {
+    useCache (cache, expires) {
       this._cache = cache;
+      this._expires = expires;
       return this;
     }
     runQuery () {
       return new Promise((resolve, reject)=>{
         let query = this._query;
         let cache = this._cache;
-        console.log('cache.available:', cache.available);
-        if (Boolean(cache) === true && cache.available === true) {
-          let key = hasha(
-            CircularJSON.stringify(query),
-            { algorithm: 'sha256' }
-          );
-          console.log(key);
-          console.log('Checking key..');
-          cache.get(key)
-            .then(console.log)
-            .catch(console.log);
-        } else {
-          Datastore
-            .runQuery(this._query)
-            .then((results)=>{
-              let entities = results[0];
-              let keys = entities.map(entity => entity[Datastore.KEY]);
-              let info = results[1];
-              let endCursor = (
-                info.moreResults !== Datastore.NO_MORE_RESULTS ?
-                info.endCursor :
-                null
-              );
-              resolve({entities, keys, endCursor});
-            })
-            .catch(reject);
-        }
+        let expires = this._expires;
+        let key = hasha(
+          CircularJSON.stringify(query),
+          { algorithm: 'sha256' }
+        );
+        Promise.resolve()
+          .then(() => {
+            if (Boolean(cache) === true && cache.available === true) {
+              cache
+                .get(key)
+                .then((reply) => JSON.parse(reply))
+            } else {
+              return Promise.resolve();
+            }
+          })
+          .then((reply) => {
+            // reply = value received from cache.
+            if (Boolean(reply) === true) {
+              // if we have it, resolve it.
+              return Promise.resolve(reply);
+            } else {
+              // if not, we load it then cache it.
+              return new Promise((resolve, reject) => {
+                Datastore
+                  .runQuery(this._query)
+                  .then((results)=>{
+                    let entities = results[0];
+                    let keys = entities.map(entity => entity[Datastore.KEY]);
+                    let info = results[1];
+                    let endCursor = (
+                      info.moreResults !== Datastore.NO_MORE_RESULTS ?
+                      info.endCursor :
+                      null
+                    );
+                    let data = { entities, keys, endCursor };
+                    cache
+                      .set(key, JSON.stringify(data), expires)
+                      .then(() => resolve(data))
+                      .catch(reject);
+                  })
+                  .catch(reject);
+              });
+            }
+          })
+          .then(resolve)
+          .catch(reject);
       });
     }
   };
