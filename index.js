@@ -2,6 +2,7 @@ const GoogleCloudDatastore = require('@google-cloud/datastore');
 const UUID = require('uuid-random');
 const async = require('async');
 const redis = require('redis');
+const hashObj = require('hash-obj');
 
 const Toolkit = (opts) => {
   const Datastore = new GoogleCloudDatastore(opts);
@@ -60,34 +61,47 @@ const Toolkit = (opts) => {
       if (Boolean(endCursor) === true) {
         query = query.start(endCursor);
       }
-      this.query = query;
+      this._query = query;
+      this._cache = undefined;
     }
     ascend (col) {
-      this.query = this.query.order(col);
+      this._query = this._query.order(col);
       return this;
     }
     descend (col) {
-      this.query = this.query.order(col, {
+      this._query = this._query.order(col, {
         descending: true,
       });
       return this;
     }
     select (fields) {
-      this.query = this.query.select(fields);
+      this._query = this._query.select(fields);
       return this;
     }
     filter (col, operator, val) {
-      this.query = this.query.filter(col, operator, val);
+      this._query = this._query.filter(col, operator, val);
       return this;
     }
     limit (limit) {
-      this.query = this.query.limit(limit);
+      this._query = this._query.limit(limit);
+      return this;
+    }
+    useCache (cache) {
+      this._cache = cache;
       return this;
     }
     runQuery () {
       return new Promise((resolve, reject)=>{
+        let query = this._query;
+        let cache = this._cache;
+        if (Boolean(cache) === true && cache.available === true) {
+          let key = hashObj(query, { algorithm: 'sha256' });
+          console.log(key);
+        } else {
+
+        }
         Datastore
-          .runQuery(this.query)
+          .runQuery(this._query)
           .then((results)=>{
             let entities = results[0];
             let keys = entities.map(entity => entity[Datastore.KEY]);
@@ -349,8 +363,6 @@ const Toolkit = (opts) => {
       const client = this._client;
       return new Promise((resolve, reject) => {
         client.get(key, (err, reply) => {
-          console.log('err:', err);
-          console.log('reply:', reply);
           Boolean(err) ? reject(err) : resolve(reply);
         });
       });
@@ -360,14 +372,10 @@ const Toolkit = (opts) => {
       return new Promise((resolve, reject) => {
         if (Boolean(parseInt(expires)) === true) {
           client.set(key, value, 'EX', expires, (err, reply) => {
-            console.log('err:', err);
-            console.log('reply:', reply);
             Boolean(err) ? reject(err) : resolve(reply);
           });
         } else {
           client.set(key, value, (err, reply) => {
-            console.log('err:', err);
-            console.log('reply:', reply);
             Boolean(err) ? reject(err) : resolve(reply);
           });
         }

@@ -14,6 +14,13 @@ let myCache = new RedisCache({
   url: '//10.140.0.2:6379',
   password: 'Bjq3DojKaYvj',
 });
+
+let myReader = new Reader('Reports').useCache(myCache);
+myReader
+  .runQuery()
+  .then(console.log)
+  .catch(console.log);
+
 myCache
   .set('name', 'Isaiah Joshua', 5)
   .then(() => myCache.get('name'))
