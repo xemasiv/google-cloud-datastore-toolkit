@@ -103,7 +103,6 @@ const Toolkit = (opts) => {
           { algorithm: 'sha256' }
         );
         console.log('Key:', key);
-        let data;
         Promise.resolve()
           .then(() => {
             if (Boolean(cache) === true && cache.available === true) {
@@ -112,20 +111,19 @@ const Toolkit = (opts) => {
                 .get(key)
                 .then((reply) => {
                   console.log('FETCHED SUCCESSFUL');
-                  data = JSON.parse(reply);
-                  return Promise.resolve();
+                  return Promise.resolve(JSON.parse(reply));
                 })
             } else {
               return Promise.resolve();
             }
           })
-          .then(() => {
+          .then((data) => {
             console.log('DATA:', data);
             // reply = value received from cache.
             if (Boolean(data) === true) {
               console.log('RESOLVING FROM CACHE');
               // if we have it, resolve it.
-              return Promise.resolve();
+              return Promise.resolve(data);
             } else {
               console.log('RESOLVING FROM DATASTORE FETCH');
               // if not, we load it then cache it.
@@ -144,14 +142,14 @@ const Toolkit = (opts) => {
                     data = { entities, keys, endCursor };
                     cache
                       .set(key, JSON.stringify(data), expires)
-                      .then(() => resolve())
+                      .then(() => resolve(data))
                       .catch(reject);
                   })
                   .catch(reject);
               });
             }
           })
-          .then(() => {
+          .then((data) => {
             resolve(data);
           })
           .catch(reject);
