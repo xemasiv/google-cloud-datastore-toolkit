@@ -122,8 +122,7 @@ const Toolkit = (opts) => {
           .then(() => {
             return new Promise((resolve, reject) => {
               if (Boolean(data) === true) {
-                console.log('Boolean data is true!');
-                console.log(data);
+                console.log('Successfully loaded from redis!');
                 resolve();
                 return;
               }
