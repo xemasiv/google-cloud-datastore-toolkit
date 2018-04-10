@@ -7,6 +7,8 @@
 
 ### Changelog
 
+* v4.0
+  * Moved helpers to Toolkit.Helpers
 * v3.2
   * New helpers: AssocPromise, AssocIterate
     * https://gist.github.com/xemasiv/90b6d8254545c422ae6c89f207312c42
@@ -21,7 +23,7 @@
 ### Unrelated Notes
 
 * It's too tiring to write docs.
-* Maybe in v4, or v5, or v68.
+* Maybe in v5, or v6, or v68.
 
 ### Classes, Methods, Arguments & Properties
 

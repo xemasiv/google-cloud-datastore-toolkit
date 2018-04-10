@@ -356,6 +356,15 @@ const Toolkit = (opts) => {
     }
   }
 
+  return {
+    Reader, Entity, Batch,
+    IterablePromise, Queue, RedisCache,
+    AssocPromise, AssocIterate
+  };
+};
+
+const Helpers = () => {
+
   class Queue {
     constructor (concurrency) {
       let queue = async.queue((executableFunction, callback) => {
@@ -506,9 +515,14 @@ const Toolkit = (opts) => {
   }
 
   return {
-    Reader, Entity, Batch,
-    IterablePromise, Queue, RedisCache,
-    AssocPromise, AssocIterate
+    Queue,
+    IterablePromise,
+    AssocPromise,
+    AssocIterate,
+    RedisCache
   };
-}
+};
+
+Toolkit.Helpers = Helpers();
+
 module.exports = Toolkit;
