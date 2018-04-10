@@ -357,9 +357,7 @@ const Toolkit = (opts) => {
   }
 
   return {
-    Reader, Entity, Batch,
-    IterablePromise, Queue, RedisCache,
-    AssocPromise, AssocIterate
+    Reader, Entity, Batch
   };
 };
 

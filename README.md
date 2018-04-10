@@ -7,6 +7,8 @@
 
 ### Changelog
 
+* v4.1
+  * Woops typo
 * v4.0
   * Moved helpers to Toolkit.Helpers
 * v3.2
