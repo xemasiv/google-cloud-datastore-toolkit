@@ -7,20 +7,21 @@
 
 ### Changelog
 
+* v3.2
+  * New helpers: AssocPromise, AssocIterate
+    * https://gist.github.com/xemasiv/90b6d8254545c422ae6c89f207312c42
 * v3.1
   * Fixed handling for Reader when cache is not present.
 * v3.0
   * Entity now has strict consistency with Datastore
-  * `fromUUID()` now upserts with empty data.
-  * `fromKeyName(keyName, autoUpsert)` now auto-loads data, with auto-upsert option if no record was found.
-  * `fromFilters(filters)` now auto-loads data.
-  * `merge(data)` and `upsert(data)` now also fetches data for consistency.
-  * Internal use of `_kind`, `_key` and `_data`, so unwanted mutations with `.kind`, `.key` and `.data` will be ignored.
-  * `Entity.exists(kind, keyName)` as static function.
-  * Plus a lot more updates come on.
+  * New helpers: RedisCache, Queue, IterablePromise
 * v2
   * Everything's a mess, don't use.
 
+### Unrelated Notes
+
+* It's too tiring to write docs.
+* Maybe in v4, or v5, or v68.
 
 ### Classes, Methods, Arguments & Properties
 
@@ -74,6 +75,10 @@
 
 * Reader
 * Batch
+
+* AssocPromise
+* AssocIterate
+
 * IterablePromise
   * `constructor(iterableArray)` Function
     * `iterableArray` is the iterable to be iterated.

@@ -393,6 +393,76 @@ const Toolkit = (opts) => {
     }
   }
 
+  class AssocPromise{
+  	constructor () {
+    	this._iterable = [];
+    }
+    push (iterate) {
+    	if (Boolean(iterate._label) === false) {
+      	return;
+      }
+    	if (Boolean(iterate._fn) === false) {
+      	return;
+      }
+    	this._iterable.push(iterate);
+      return this;
+    }
+    all () {
+      let iterable = this._iterable;
+      let resultObject = {};
+      return Promise.all(
+        iterable.map((iterate) => {
+          return new Promise((resolve, reject) => {
+            let label = iterate._label;
+            let thisArg = iterate._thisArg;
+            let fn = iterate._fn;
+            let args = iterate._args;
+            fn.apply(thisArg, args)
+              .then((result) => {
+                resultObject[label] = result;
+                resolve();
+              })
+              .catch((error) => {
+                resultObject[label] = error;
+                resolve(true);
+              });
+          });
+        })
+      )
+      .then((results) => {
+      	results.map((result) => {
+          if (Boolean(result) === true) {
+            return Promise.reject(resultObject);
+          }
+        });
+      	return Promise.resolve(resultObject);
+      })
+      .catch(() => {
+      	return Promise.reject(resultObject);
+      })
+    }
+  }
+
+  class AssocIterate{
+  	constructor (label) {
+    	this._label = label;
+      this._thisArg = null;
+      this._args = [];
+    }
+    thisArg (thisArg) {
+    	this._thisArg = thisArg;
+      return this;
+    }
+    args (...args) {
+    	this._args = args;
+      return this;
+    }
+    fn (fn) {
+    	this._fn = fn;
+      return this;
+    }
+  }
+
   class RedisCache {
     constructor (redisOpts) {
       const client = redis.createClient(redisOpts);
@@ -435,6 +505,10 @@ const Toolkit = (opts) => {
     }
   }
 
-  return { Reader, Entity, Batch, IterablePromise, Queue, RedisCache };
+  return {
+    Reader, Entity, Batch,
+    IterablePromise, Queue, RedisCache,
+    AssocPromise, AssocIterate
+  };
 }
 module.exports = Toolkit;
