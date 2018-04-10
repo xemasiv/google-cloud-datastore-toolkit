@@ -119,6 +119,7 @@ const Toolkit = (opts) => {
             });
           })
           .then(() => {
+            let cache = this._cache;
             return new Promise((resolve, reject) => {
               if (Boolean(data) === true) {
                 resolve();
@@ -136,6 +137,10 @@ const Toolkit = (opts) => {
                     null
                   );
                   data = { entities, keys, endCursor };
+                  if (Boolean(cache) === false || cache.available === false) {
+                    resolve();
+                    return;
+                  }
                   cache
                     .set(key, JSON.stringify(data), expires)
                     .then(() => resolve())

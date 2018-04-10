@@ -7,7 +7,9 @@
 
 ### Changelog
 
-* v3
+* v3.1
+  * Fixed handling for Reader when cache is not present.
+* v3.0
   * Entity now has strict consistency with Datastore
   * `fromUUID()` now upserts with empty data.
   * `fromKeyName(keyName, autoUpsert)` now auto-loads data, with auto-upsert option if no record was found.
@@ -15,6 +17,7 @@
   * `merge(data)` and `upsert(data)` now also fetches data for consistency.
   * Internal use of `_kind`, `_key` and `_data`, so unwanted mutations with `.kind`, `.key` and `.data` will be ignored.
   * `Entity.exists(kind, keyName)` as static function.
+  * Plus a lot more updates come on.
 * v2
   * Everything's a mess, don't use.
 
