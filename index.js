@@ -365,20 +365,23 @@ const Helpers = () => {
 
   class Queue {
     constructor (concurrency) {
-      let queue = async.queue((executableFunction, callback) => {
-        executableFunction(callback);
+      let queue = async.queue((promisified, callback) => {
+        promisified(callback);        
       }, Boolean(parseInt(concurrency)) ? concurrency : 1);
       this._queue = queue;
     }
     push (executableFunction) {
       let queue = this._queue;
       return new Promise((resolve, reject) => {
-        queue.push(executableFunction, (err) => {
-          if (err) {
-            reject(err);
-            return;
-          }
-          resolve();
+      	let promisified = (callback) => {
+        	new Promise((resolve, reject) => {
+        		executableFunction(resolve, reject);
+          })
+          .then((...args)=>callback(Promise.resolve.apply(Promise, args)))
+          .catch((...args)=>callback(Promise.reject.apply(Promise, args)));
+        }
+        queue.push(promisified, (returned) => {
+          returned.then(resolve).catch(reject);
         });
       });
     }

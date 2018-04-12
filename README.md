@@ -7,6 +7,8 @@
 
 ### Changelog
 
+* v5.1
+  * Rewrite of Queue, now allows resolve and reject.
 * v4.1
   * Woops typo
 * v4.0
@@ -140,14 +142,21 @@ Promise.all([
 ### Queue
 
 ```
-let myQueue = new Queue();
-let queueItem = myQueue.push((callback)=>{
-    setTimeout(() => {
-      callback();
-    }, 5000)
-  })
-  .then(() => console.log('queue ok!'))
-  .catch(console.log);
+let x = new Queue();
+Promise.resolve()
+	.then(() => x.push((resolve, reject) => {
+   	resolve(123);
+  }))
+  .then(console.log)
+  .then(() => x.push((resolve, reject) => {
+   	resolve(456);
+   }))
+  .then(console.log)
+	.then(() => x.push((resolve, reject) => {
+   	resolve(123);
+  }))
+  .then(console.log)
+  .catch(console.error)
 ```
 
 ### IterablePromise
