@@ -7,6 +7,10 @@
 
 ### Changelog
 
+* v6.1
+  * Fixed Entity.fromUUID bug:
+	* Auto-assigned Key ID's are Integer. Across browser-server, these keys might be interpreted as String, which results in unpredictability
+	* The fix is to use RegExUUIDv4 on keyName argument. If regex passed, keep it. Otherwise, parseInt it. This way non-uuidv4 keynames are transformed into Integers and not Strings.
 * v5.1
   * Rewrite of Queue, now allows resolve and reject.
 * v4.1

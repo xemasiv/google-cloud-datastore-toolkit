@@ -205,6 +205,10 @@ const Toolkit = (opts) => {
     }
     fromKeyName (keyName, autoUpsert) {
       let instance = this;
+	  let RegExUUIDv4 = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/;
+	  if (RegExUUIDv4.test(keyName) === false) {
+		keyName = parseInt(keyName);
+	  }
       let kind = instance._kind;
       let key = Datastore.key([kind, keyName]);
       let data = {};
