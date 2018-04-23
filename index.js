@@ -4,6 +4,7 @@ const async = require('async');
 const redis = require('redis');
 const hasha = require('hasha');
 const CircularJSON = require('circular-json');
+const RegExUUIDv4 = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/;
 
 const Toolkit = (opts) => {
   const Datastore = new GoogleCloudDatastore(opts);
@@ -205,16 +206,17 @@ const Toolkit = (opts) => {
     }
     fromKeyName (keyName, autoUpsert) {
       let instance = this;
-	  let RegExUUIDv4 = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/;
-	  if (RegExUUIDv4.test(keyName) === false) {
-		keyName = parseInt(keyName);
-	  }
-      let kind = instance._kind;
-      let key = Datastore.key([kind, keyName]);
-      let data = {};
+	  let kind, key, data, parsedKeyName;
+      kind = instance._kind;
+	  
+	  // if UUIDv4, keep as string, otherwise parse as Integer.
+	  parsedKeyName = RegExUUIDv4.test(keyName) ? keyName : parseInt(keyName);
+	  
+      key = Datastore.key([kind, parsedKeyName]);
+      data = {};
       return new Promise((resolve, reject)=>{
-        Datastore
-          .get(key)
+		Promise.resolve()
+		  .then(() => Datastore.get(key))
           .then((results) => {
             if (Boolean(results[0]) === true) {
               instance._key = key;
@@ -231,15 +233,28 @@ const Toolkit = (opts) => {
                   })
                   .catch(DatastoreErrorReject(reject));
               } else {
-                reject({
-                  type: EntityErrorTypes.ENTITY_NOT_FOUND
-                })
+				return Promise.reject();
               }
             }
           })
-          .catch(
-            DatastoreErrorReject(reject)
-          );
+		  .catch(() => {
+			// if not found as Integer, try as String		
+		    parsedKeyName = String(keyName);
+			key = Datastore.key([kind, parsedKeyName]);
+			return Datastore.get(key);
+		  })
+		  .then((results) => {
+            if (Boolean(results[0]) === true) {
+              instance._key = key;
+              instance._data = results[0];
+              resolve();
+            } else {
+              reject({
+                type: EntityErrorTypes.ENTITY_NOT_FOUND
+              })
+            }
+		  })
+          .catch(DatastoreErrorReject(reject));
       });
     }
     fromFilters (filters) {

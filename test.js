@@ -9,7 +9,17 @@ const {
 } = require('./index')({
   projectId: 'pac-1234'
 });
-
+let mega_center = new Entity('MegaCenters');
+mega_center.fromKeyName(5659313586569216)
+	.then(() => console.log(mega_center.data))
+	.catch(console.log);
+mega_center.fromKeyName('5659313586569216')
+	.then(() => console.log(mega_center.data))
+	.catch(console.log);
+mega_center.fromKeyName('18a6ada7-a332-49e4-9441-d0fa60aa2915')
+	.then(() => console.log(mega_center.data))
+	.catch(console.log);
+/*
 let myCache = new RedisCache({
   url: '//10.140.0.2:6379',
   password: 'Bjq3DojKaYvj',
@@ -55,7 +65,6 @@ Promise.resolve()
   })
   .catch(console.log);
 
-/*
 myCache
   .set('name', 'Isaiah Joshua', 5)
   .then(() => myCache.get('name'))

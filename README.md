@@ -7,6 +7,11 @@
 
 ### Changelog
 
+* v7.1
+  * Fixed Entity.fromKeyName
+	* If passes UUIDv4 regex test, keep keyName as string.
+	* Otherwise, apply parseInt
+	* If no entity was found, load as String.
 * v6.1
   * Fixed Entity.fromUUID bug:
 	* Auto-assigned Key ID's are Integer. Across browser-server, these keys might be interpreted as String, which results in unpredictability
