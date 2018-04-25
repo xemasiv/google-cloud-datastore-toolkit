@@ -17,6 +17,40 @@ const Toolkit = (opts) => {
     DATASTORE_ERROR: 'DATASTORE_ERROR'
   };
 
+  class Transaction{
+    constructor (...keyPairs) {
+      this.transaction = Datastore.transaction();
+      this.keyPairs = keyPairs;
+    }
+    start (executorFn) {
+      const { transaction, keyPairs } = this;
+      let T = this;
+      return transaction
+        .run()
+        .then(() => {
+          return Promise.all(keyPairs.map((keyPair) => transaction.get(keyPair[1])));
+        })
+        .then((results) => {
+          let mappedResults = {};
+          keyPairs.map((keyPair, keyPairIndex) => {
+            mappedResults[keyPair[0]] = results[keyPairIndex][0];
+          });
+          return executorFn(mappedResults, T);
+        });
+    }
+    commit (mappedResults) {
+      const { transaction, keyPairs } = this;
+      const updateArray =  keyPairs.map((keyPair) => {
+        return {
+          key: keyPair[1],
+          data: mappedResults[keyPair[0]]
+        };
+      });
+      transaction.save(updateArray);
+      return transaction.commit().catch(() => transaction.rollback());
+    }
+  }
+
   class Batch {
     constructor (type) {
       switch (type) {
@@ -208,10 +242,10 @@ const Toolkit = (opts) => {
       let instance = this;
 	  let kind, key, data, parsedKeyName;
       kind = instance._kind;
-	  
+
 	  // if UUIDv4, keep as string, otherwise parse as Integer.
 	  parsedKeyName = RegExUUIDv4.test(keyName) ? keyName : parseInt(keyName);
-	  
+
       key = Datastore.key([kind, parsedKeyName]);
       data = {};
       return new Promise((resolve, reject)=>{
@@ -238,7 +272,7 @@ const Toolkit = (opts) => {
             }
           })
 		  .catch(() => {
-			// if not found as Integer, try as String		
+			// if not found as Integer, try as String
 		    parsedKeyName = String(keyName);
 			key = Datastore.key([kind, parsedKeyName]);
 			return Datastore.get(key);
@@ -376,7 +410,7 @@ const Toolkit = (opts) => {
   }
 
   return {
-    Reader, Entity, Batch
+    Reader, Entity, Batch, Transaction
   };
 };
 
@@ -385,7 +419,7 @@ const Helpers = () => {
   class Queue {
     constructor (concurrency) {
       let queue = async.queue((promisified, callback) => {
-        promisified(callback);        
+        promisified(callback);
       }, Boolean(parseInt(concurrency)) ? concurrency : 1);
       this._queue = queue;
     }

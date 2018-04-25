@@ -7,6 +7,8 @@
 
 ### Changelog
 
+* v7.2
+  * Added Transaction support, see below.
 * v7.1
   * Fixed Entity.fromKeyName
 	* If passes UUIDv4 regex test, keep keyName as string.
@@ -35,10 +37,57 @@
 
 ### Unrelated Notes
 
-* It's too tiring to write docs.
-* Maybe in v5, or v6, or v68.
+* Lol I'm too lazy to write docs.
 
 ### Classes, Methods, Arguments & Properties
+Added @ `v7.2`
+
+* Transaction
+  * `constructor(...keyPairs)`
+    * Creates a Transaction instance.
+    * Accepts multiple key pairs, label are mapped to entity data.
+    * Accepted Arguments
+      * `keyPair` / args[0 to n] / Array : [label, key]
+        Array Values
+          * `label` / array[0] / string
+          * `key` / array[1] / object; a datastore.key
+  * `start(executorFunction)`
+    * Passes the Function / Promise that handles the transaction.
+    * Accepted Arguments
+      * `executorFunction`
+        Passed Arguments
+          * `mappedResults` / args[0] / object
+            * Modified and passed to 1T.commit()`
+            * Format: `{ [label] : [data] }`
+          * `T` / args[1], object
+            * For running `T.commit(mappedResults)`
+  * `commit(mappedResults)`
+    * Receives the Updated mappedResults.
+    * Saves and commits the the transaction.
+    * Executes a rollback on commit error.
+    * Accepted Arguments
+      * `mappedResults` / args[0] / object
+
+```
+    let transactionAmount = 10;
+    return new Transaction(
+      ['alice', alice.key],
+      ['bob', bob.key]
+    ).start((R, T) => {
+      R.alice.current -= transactionAmount;
+      R.bob.current += transactionAmount;
+      /*
+        Validations:
+        - No NaN / undefined / null value found.
+        - Final values didn't equate below zero.
+      */
+      if (R.alice.current < 0) {
+        return Promise.reject("Invalid transaction.")
+      } else {
+        return T.commit(R);
+      }
+    });
+```
 
 * Entity
   * `constructor(kind)` Function
