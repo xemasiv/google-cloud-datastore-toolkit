@@ -1,3 +1,13 @@
+
+# Deprecated
+
+> Turns out this implementation has lots of data consistency holes.
+> Refactored with breaking changes:
+> @ https://github.com/xemasiv/datastore2
+> @ https://www.npmjs.com/package/datastore2
+
+---
+
 ### Google Cloud Datastore Toolkit
 
 * Goals
